@@ -1,0 +1,42 @@
+import mongoose from "mongoose";
+
+const customerSchema = new mongoose.Schema(
+    {
+        fullName: {
+            type: String,
+            required: true,
+            trim: true
+        },
+
+        email: {
+            type: String,
+            required: true,
+            unique: true,
+            trim: true
+        },
+
+        password: {
+            type: String,
+            required: true
+        },
+
+        phone: {
+            type: String,
+            required: true
+        },
+
+        wishlist: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Product"
+            }
+        ]
+    },
+    {
+        timestamps: true
+    }
+);
+
+const Customer = mongoose.model("Customer", customerSchema);
+
+export default Customer;
