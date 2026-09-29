@@ -18,7 +18,6 @@ function Products() {
     const [savingId, setSavingId] = useState(null);
     const [wishlistError, setWishlistError] = useState("");
 
-    // Fetch products
     const fetchProducts = async () => {
         try {
             setLoading(true);
@@ -57,7 +56,6 @@ function Products() {
         }
     };
 
-    // Fetch wishlist
     const fetchWishlist = async () => {
         try {
             const response = await axiosInstance.get("/wishlist");
@@ -77,7 +75,6 @@ function Products() {
         fetchWishlist();
     }, []);
 
-    // Search + category filter
     useEffect(() => {
         const timer = setTimeout(() => {
             fetchProducts();
@@ -86,7 +83,6 @@ function Products() {
         return () => clearTimeout(timer);
     }, [search, category]);
 
-    // Add product to wishlist
     const handleWishlist = async (productId) => {
         try {
             setSavingId(productId);
@@ -127,7 +123,6 @@ function Products() {
         <div className="min-h-screen bg-[#f5f5f7]">
             <Navbar />
 
-            {/* Hero Section */}
             <section className="relative overflow-hidden bg-black text-white">
                 <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-3xl"></div>
 
@@ -152,11 +147,9 @@ function Products() {
                 </div>
             </section>
 
-            {/* Search + Category */}
             <section className="relative max-w-7xl mx-auto px-6 -mt-10">
                 <div className="bg-white rounded-3xl shadow-xl p-3 flex flex-col md:flex-row gap-3">
 
-                    {/* Search */}
                     <div className="flex-1 flex items-center bg-[#f5f5f7] rounded-2xl px-5">
                         <span className="text-gray-400 text-xl">
                             ⌕
@@ -173,7 +166,6 @@ function Products() {
                         />
                     </div>
 
-                    {/* Category */}
                     <div className="md:w-64">
                         <select
                             value={category}
@@ -199,17 +191,14 @@ function Products() {
                 </div>
             </section>
 
-            {/* Main */}
             <main className="max-w-7xl mx-auto px-6 py-14">
 
-                {/* Wishlist Error */}
                 {wishlistError && (
                     <div className="mb-6 bg-red-50 border border-red-100 text-red-600 rounded-xl px-5 py-4">
                         {wishlistError}
                     </div>
                 )}
 
-                {/* Header */}
                 {!loading && !error && (
                     <div className="flex items-end justify-between mb-8">
                         <div>
@@ -232,7 +221,6 @@ function Products() {
                     </div>
                 )}
 
-                {/* Loading */}
                 {loading && (
                     <div className="min-h-80 flex items-center justify-center">
                         <div className="text-center">
@@ -245,7 +233,6 @@ function Products() {
                     </div>
                 )}
 
-                {/* Error */}
                 {!loading && error && (
                     <div className="min-h-80 flex items-center justify-center">
                         <div className="bg-white rounded-3xl shadow-sm p-12 text-center max-w-md">
@@ -271,7 +258,6 @@ function Products() {
                     </div>
                 )}
 
-                {/* Empty */}
                 {!loading &&
                     !error &&
                     products.length === 0 && (
@@ -303,7 +289,6 @@ function Products() {
                         </div>
                     )}
 
-                {/* Product Grid */}
                 {!loading &&
                     !error &&
                     products.length > 0 && (
@@ -324,7 +309,6 @@ function Products() {
                                         className="group bg-white rounded-3xl overflow-hidden border border-gray-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500"
                                     >
 
-                                        {/* Product Image */}
                                         <div className="relative h-72 bg-gray-50 overflow-hidden">
 
                                             <img
@@ -338,14 +322,12 @@ function Products() {
                                                 className="w-full h-full object-contain p-5 group-hover:scale-105 transition-transform duration-500"
                                             />
 
-                                            {/* Category */}
                                             <div className="absolute top-4 left-4">
                                                 <span className="bg-white/95 backdrop-blur-md px-4 py-2 rounded-full text-xs font-bold text-gray-800 shadow-sm border border-gray-100">
                                                     {product.category}
                                                 </span>
                                             </div>
 
-                                            {/* Stock */}
                                             <div className="absolute top-4 right-4">
                                                 {product.stock > 0 ? (
                                                     <span className="bg-green-500 text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow">
@@ -359,7 +341,6 @@ function Products() {
                                             </div>
                                         </div>
 
-                                        {/* Product Details */}
                                         <div className="p-6">
 
                                             <h3 className="text-xl font-bold text-gray-900 truncate">
@@ -372,7 +353,6 @@ function Products() {
                                                     : "Currently unavailable"}
                                             </p>
 
-                                            {/* Price */}
                                             <p className="text-2xl font-bold text-gray-900 mt-5">
                                                 ₹
                                                 {product.price.toLocaleString(
@@ -380,7 +360,6 @@ function Products() {
                                                 )}
                                             </p>
 
-                                            {/* View Product */}
                                             <button
                                                 onClick={() =>
                                                     navigate(
@@ -392,7 +371,6 @@ function Products() {
                                                 View Product
                                             </button>
 
-                                            {/* Wishlist */}
                                             <button
                                                 onClick={() => {
                                                     if (
