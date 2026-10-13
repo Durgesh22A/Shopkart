@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { axiosInstance } from "../axiosCalls/axios";
 import Navbar from "../components/Navbar";
+import { useCart } from "../context/CartContext";
 
 function ProductDetails() {
     const { id } = useParams();
@@ -11,6 +12,9 @@ function ProductDetails() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [added, setAdded] = useState(false);
+    const [cartError, setCartError] = useState("");
+    const { addToCart, cartItems, isPending } = useCart();
+    const isInCart = product && cartItems.some((item) => item.product?._id === product._id);
 
     const fetchProduct = async () => {
         try {
@@ -37,12 +41,15 @@ function ProductDetails() {
         fetchProduct();
     }, [id]);
 
-    const handleAddToCart = () => {
-        setAdded(true);
-
-        setTimeout(() => {
-            setAdded(false);
-        }, 2000);
+    const handleAddToCart = async () => {
+        try {
+            setCartError("");
+            await addToCart(product._id);
+            setAdded(true);
+            setTimeout(() => setAdded(false), 1600);
+        } catch (requestError) {
+            setCartError(requestError.message);
+        }
     };
 
     return (
@@ -254,9 +261,10 @@ function ProductDetails() {
 
 
                                 {/* Add to Cart */}
+                                {cartError && <p className="mt-6 text-sm text-red-600 text-center">{cartError}</p>}
                                 <button
-                                    onClick={handleAddToCart}
-                                    disabled={product.stock === 0}
+                                    onClick={() => isInCart ? navigate("/cart") : handleAddToCart()}
+                                    disabled={product.stock === 0 || isPending(product._id)}
                                     className={`w-full mt-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 ${
                                         product.stock === 0
                                             ? "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -267,11 +275,14 @@ function ProductDetails() {
                                 >
                                     {product.stock === 0
                                         ? "Out of Stock"
+                                        : isInCart
+                                        ? "Go to Cart →"
                                         : added
                                         ? "✓ Added to Cart"
+                                        : isPending(product._id)
+                                        ? "Adding..."
                                         : "Add to Cart"}
                                 </button>
-
 
                                 {/* Extra Info */}
                                 <div className="flex items-center justify-center gap-8 mt-7 text-sm text-gray-400">

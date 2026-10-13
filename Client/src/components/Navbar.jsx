@@ -1,12 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "../axiosCalls/axios";
+import { useCart } from "../context/CartContext";
 
 function Navbar() {
     const navigate = useNavigate();
+    const { itemCount, clearCartLocally } = useCart();
 
     const handleLogout = async () => {
         try {
             await axiosInstance.post("/customers/logout");
+            clearCartLocally();
             navigate("/login");
         } catch (error) {
             console.log(error);
@@ -48,6 +51,21 @@ function Navbar() {
                 >
                     <span className="text-lg">♡</span>
                     Wishlist
+                </button>
+
+                <button
+                    onClick={() => navigate("/cart")}
+                    className="hover:text-gray-400 transition flex items-center gap-1"
+                >
+                    <span className="text-lg">🛒</span>
+                    Cart ({itemCount})
+                </button>
+
+                <button
+                    onClick={() => navigate("/orders")}
+                    className="hover:text-gray-400 transition"
+                >
+                    Orders
                 </button>
 
 

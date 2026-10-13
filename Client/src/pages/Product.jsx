@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "../axiosCalls/axios";
 import Navbar from "../components/Navbar";
+import { useCart } from "../context/CartContext";
 
 function Products() {
     const navigate = useNavigate();
@@ -17,6 +18,8 @@ function Products() {
     const [wishlistIds, setWishlistIds] = useState([]);
     const [savingId, setSavingId] = useState(null);
     const [wishlistError, setWishlistError] = useState("");
+    const [cartError, setCartError] = useState("");
+    const { addToCart, cartItems, isPending } = useCart();
 
     const fetchProducts = async () => {
         try {
@@ -119,6 +122,15 @@ function Products() {
         }
     };
 
+    const handleAddToCart = async (productId) => {
+        try {
+            setCartError("");
+            await addToCart(productId);
+        } catch (requestError) {
+            setCartError(requestError.message);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-[#f5f5f7]">
             <Navbar />
@@ -196,6 +208,12 @@ function Products() {
                 {wishlistError && (
                     <div className="mb-6 bg-red-50 border border-red-100 text-red-600 rounded-xl px-5 py-4">
                         {wishlistError}
+                    </div>
+                )}
+
+                {cartError && (
+                    <div className="mb-6 bg-red-50 border border-red-100 text-red-600 rounded-xl px-5 py-4">
+                        {cartError}
                     </div>
                 )}
 
@@ -302,6 +320,9 @@ function Products() {
 
                                 const isSaving =
                                     savingId === product._id;
+                                const isInCart = cartItems.some(
+                                    (item) => item.product?._id === product._id
+                                );
 
                                 return (
                                     <div
@@ -328,7 +349,7 @@ function Products() {
                                                 </span>
                                             </div>
 
-                                            <div className="absolute top-4 right-4">
+                                            <div className="absolute top-16 right-4">
                                                 {product.stock > 0 ? (
                                                     <span className="bg-green-500 text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow">
                                                         In Stock
@@ -339,6 +360,27 @@ function Products() {
                                                     </span>
                                                 )}
                                             </div>
+
+                                            <button
+                                                type="button"
+                                                aria-label={isWishlisted ? "Open wishlist" : "Add to wishlist"}
+                                                title={isWishlisted ? "Go to Wishlist" : "Add to Wishlist"}
+                                                onClick={() => {
+                                                    if (isWishlisted) {
+                                                        navigate("/wishlist");
+                                                    } else {
+                                                        handleWishlist(product._id);
+                                                    }
+                                                }}
+                                                disabled={isSaving}
+                                                className={`absolute top-4 right-4 z-10 h-11 w-11 rounded-full grid place-items-center text-xl shadow-md transition-all disabled:cursor-wait ${
+                                                    isWishlisted
+                                                        ? "bg-pink-500 text-white hover:bg-pink-600"
+                                                        : "bg-white/95 text-gray-800 hover:text-pink-600 hover:scale-110"
+                                                }`}
+                                            >
+                                                {isSaving ? "…" : isWishlisted ? "♥" : "♡"}
+                                            </button>
                                         </div>
 
                                         <div className="p-6">
@@ -372,31 +414,11 @@ function Products() {
                                             </button>
 
                                             <button
-                                                onClick={() => {
-                                                    if (
-                                                        isWishlisted
-                                                    ) {
-                                                        navigate(
-                                                            "/wishlist"
-                                                        );
-                                                    } else {
-                                                        handleWishlist(
-                                                            product._id
-                                                        );
-                                                    }
-                                                }}
-                                                disabled={isSaving}
-                                                className={`w-full mt-3 py-3.5 rounded-xl font-semibold transition-all duration-300 ${
-                                                    isSaving
-                                                        ? "bg-gray-100 text-gray-400 cursor-wait"
-                                                        : "bg-pink-50 text-pink-600 border border-pink-100 hover:bg-pink-100"
-                                                }`}
+                                                onClick={() => isInCart ? navigate("/cart") : handleAddToCart(product._id)}
+                                                disabled={product.stock === 0 || isPending(product._id)}
+                                                className="w-full mt-3 py-3.5 rounded-xl bg-black text-white font-semibold hover:bg-gray-800 transition disabled:bg-gray-300"
                                             >
-                                                {isSaving
-                                                    ? "⏳ Saving..."
-                                                    : isWishlisted
-                                                    ? "Go to Wishlist →"
-                                                    : "♡ Add to Wishlist"}
+                                                {product.stock === 0 ? "Out of Stock" : isPending(product._id) ? "Adding..." : isInCart ? "Go to Cart →" : "🛒 Add to Cart"}
                                             </button>
 
                                         </div>

@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../axiosCalls/axios";
+import { useCart } from "../context/CartContext";
 
 function Login() {
     const navigate = useNavigate();
+    const { refreshCart } = useCart();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -21,6 +23,8 @@ function Login() {
                 email,
                 password
             });
+
+            await refreshCart({ silent: true });
 
             navigate("/home");
 
