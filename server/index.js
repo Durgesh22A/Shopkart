@@ -10,8 +10,20 @@ import orderRoutes from "./routes/order.routes.js";
 
 const app = express();
 
+const allowedOrigins = [
+    "http://localhost:5173",
+    process.env.CLIENT_URL
+].filter(Boolean);
+
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin(origin, callback) {
+        // Browserless clients (for example Render health checks) do not send Origin.
+        if (!origin || allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        return callback(new Error("Origin is not allowed by CORS"));
+    },
     credentials: true
 }));
 
