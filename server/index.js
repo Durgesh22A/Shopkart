@@ -15,10 +15,13 @@ const allowedOrigins = [
     process.env.CLIENT_URL
 ].filter(Boolean);
 
+const isShopKartVercelOrigin = (origin) =>
+    /^https:\/\/shopkart(?:-[a-z0-9-]+)?\.vercel\.app$/i.test(origin);
+
 app.use(cors({
     origin(origin, callback) {
         // Browserless clients (for example Render health checks) do not send Origin.
-        if (!origin || allowedOrigins.includes(origin)) {
+        if (!origin || allowedOrigins.includes(origin) || isShopKartVercelOrigin(origin)) {
             return callback(null, true);
         }
 
